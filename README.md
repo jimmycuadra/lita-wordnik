@@ -18,7 +18,7 @@ gem "lita-wordnik"
 
 ### Required attributes
 
-* `api_key` - Your API key for World Weather Online. Register for one at the [Wordnik Developer](http://developer.wordnik.com/) page.
+* `api_key` - Your API key for Wordnik. Register for one at the [Wordnik Developer](http://developer.wordnik.com/) page.
 
 ### Example
 
