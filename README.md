@@ -1,5 +1,3 @@
-http://developer.wordnik.com/
-
 # lita-wordnik
 
 [![Build Status](https://travis-ci.org/jimmycuadra/lita-wordnik.png)](https://travis-ci.org/jimmycuadra/lita-wordnik)
