@@ -1,6 +1,6 @@
 # lita-wordnik
 
-[![Build Status](https://travis-ci.org/jimmycuadra/lita-wordnik.png)](https://travis-ci.org/jimmycuadra/lita-wordnik)
+[![Build Status](https://travis-ci.org/jimmycuadra/lita-wordnik.png?branch=master)](https://travis-ci.org/jimmycuadra/lita-wordnik)
 [![Code Climate](https://codeclimate.com/github/jimmycuadra/lita-wordnik.png)](https://codeclimate.com/github/jimmycuadra/lita-wordnik)
 [![Coverage Status](https://coveralls.io/repos/jimmycuadra/lita-wordnik/badge.png)](https://coveralls.io/r/jimmycuadra/lita-wordnik)
 
