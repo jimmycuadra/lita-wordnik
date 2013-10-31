@@ -1,6 +1,28 @@
 require "spec_helper"
 
 describe Lita::Handlers::Wordnik, lita_handler: true do
+  let(:body) do
+    <<-BODY.chomp
+[
+  {
+    "word": "computer",
+    "text": "A device that computes, especially a programmable electronic \
+machine that performs high-speed mathematical or logical operations or that \
+assembles, stores, correlates, or otherwise processes information.",
+    "partOfSpeech": "noun"
+  }
+]
+BODY
+  end
+
+  let(:response) { double("Faraday::Response", status: 200, body: body) }
+
+  before do
+    allow_any_instance_of(
+      Faraday::Connection
+    ).to receive(:get).and_return(response)
+  end
+
   it { routes_command("define computer").to(:define) }
 
   it "sets the API key to nil by default" do
@@ -14,27 +36,7 @@ describe Lita::Handlers::Wordnik, lita_handler: true do
     end
 
     context "when the API key is set" do
-      let(:body) do
-        <<-BODY.chomp
-[
-  {
-    "word": "computer",
-    "text": "A device that computes, especially a programmable electronic \
-machine that performs high-speed mathematical or logical operations or that \
-assembles, stores, correlates, or otherwise processes information.",
-    "partOfSpeech": "noun"
-  }
-]
-BODY
-      end
-      let(:response) { double("Faraday::Response", status: 200, body: body) }
-
-      before do
-        Lita.config.handlers.wordnik.api_key = "abc123"
-        allow_any_instance_of(
-          Faraday::Connection
-        ).to receive(:get).and_return(response)
-      end
+      before { Lita.config.handlers.wordnik.api_key = "abc123" }
 
       it "replies with the definition" do
         send_command("define computer")
@@ -63,6 +65,15 @@ BODY
         allow(response).to receive(:status).and_return(500)
         send_command("define computer")
         expect(replies.last).to include("request failed")
+      end
+
+      context "when the response has no definitions" do
+        let(:body) { "[]" }
+
+        it "replies that Wordnik has no definitions" do
+          send_command("define whiskey stone")
+          expect(replies.last).to include("doesn't have any definitions")
+        end
       end
     end
   end

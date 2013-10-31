@@ -3,6 +3,8 @@ require "lita"
 module Lita
   module Handlers
     class Wordnik < Handler
+      NO_DEFINITIONS = "Wordnik doesn't have any definitions for that."
+
       def self.default_config(config)
         config.api_key = nil
       end
@@ -48,10 +50,15 @@ module Lita
         when 400
           "Wordnik didn't understand that word."
         when 404
-          "Wordnik doesn't have any definitions for that."
+          NO_DEFINITIONS
         when 200
           data = MultiJson.load(response.body).first
-          "#{data["word"]} (#{data["partOfSpeech"]}): #{data["text"]}"
+
+          if data
+            "#{data["word"]} (#{data["partOfSpeech"]}): #{data["text"]}"
+          else
+            NO_DEFINITIONS
+          end
         else
           Lita.logger.error("Wordnik request failed: #{response.inspect}")
           "Wordnik request failed. See the Lita logs."
