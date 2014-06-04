@@ -35,6 +35,29 @@ To get the definition for a word:
 ```
 Lita: define WORD
 ```
+To get synonyms for a word:
+
+```
+Lita: synonyms WORD
+```
+
+or
+
+```
+Lita: words like WORD
+```
+
+To get antonyms for a word:
+
+```
+Lita: antonyms WORD
+```
+
+or
+
+```
+Lita: words unlike WORD
+```
 
 ## License
 
