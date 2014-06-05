@@ -24,32 +24,25 @@ module Lita
       route(/^words\s*unlike\s+(.*)$/i, :antonyms, command: true, help: {
         "words unlike WORD" => "Get antonyms for WORD."
       })
-      
-      def define(response)
-        return unless validate(response)
-        word = response.matches[0][0]
-        definition = get_definition(word)
-        response.reply(definition)
+
+      class << self
+        def define_wordnik_method(name, getter_name)
+          define_method name, ->(response) do
+            return unless validate(response)
+            word = encode_word(response.matches[0][0])
+            result = send(getter_name, word)
+            response.reply(result)
+          end
+        end
       end
-      
-      def synonyms(response)
-        return unless validate(response)
-        word = response.matches[0][0]
-        synonyms = get_synonyms(word)
-        response.reply(synonyms)
-      end
-      
-      def antonyms(response)
-        return unless validate(response)
-        word = response.matches[0][0]
-        antonyms = get_antonyms(word)
-        response.reply(antonyms)
-      end
+
+      define_wordnik_method :define, :definition_for
+      define_wordnik_method :synonyms, :synonyms_for
+      define_wordnik_method :antonyms, :antonyms_for
 
       private
 
-      def get_definition(word)
-        word = encode_word(word)
+      def definition_for(word)
         url = "http://api.wordnik.com/v4/word.json/#{word}/definitions"
         Lita.logger.debug("Making Wordnik API request to #{url}.")
         process_response http.get(
@@ -61,9 +54,8 @@ module Lita
           includeTags: false
         )
       end
-      
-      def get_synonyms(word)
-        word = encode_word(word)
+
+      def synonyms_for(word)
         url = "http://api.wordnik.com/v4/word.json/#{word}/relatedWords"
         Lita.logger.debug("Making Wordnik API request to #{url}.")
         process_response http.get(
@@ -74,9 +66,8 @@ module Lita
           limitPerRelationshipType: 5
         )
       end
-      
-      def get_antonyms(word)
-        word = encode_word(word)
+
+      def antonyms_for(word)
         url = "http://api.wordnik.com/v4/word.json/#{word}/relatedWords"
         Lita.logger.debug("Making Wordnik API request to #{url}.")
         process_response http.get(
@@ -87,7 +78,7 @@ module Lita
           limitPerRelationshipType: 5
         )
       end
-      
+
       def encode_word(word)
         begin
           URI.parse(word)

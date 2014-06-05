@@ -17,26 +17,24 @@ describe Lita::Handlers::Wordnik, lita_handler: true do
 
   context "with Faraday stubbing" do
     before do
-      allow_any_instance_of(
-        Faraday::Connection
-      ).to receive(:get).and_return(response)
+      allow_any_instance_of( Faraday::Connection).to receive(:get).and_return(response)
     end
-    
+
     describe "#define" do
       let(:body) do
         <<-BODY.chomp
-    [
-      {
-        "word": "computer",
-        "text": "A device that computes, especially a programmable electronic \
-    machine that performs high-speed mathematical or logical operations or that \
-    assembles, stores, correlates, or otherwise processes information.",
-        "partOfSpeech": "noun"
-      }
-    ]
-    BODY
+[
+  {
+    "word": "computer",
+    "text": "A device that computes, especially a programmable electronic \
+machine that performs high-speed mathematical or logical operations or that \
+assembles, stores, correlates, or otherwise processes information.",
+    "partOfSpeech": "noun"
+  }
+]
+BODY
       end
-    
+
       it "replies that the API key is required" do
         send_command("define computer")
         expect(replies.last).to include("API key required")
@@ -84,132 +82,52 @@ describe Lita::Handlers::Wordnik, lita_handler: true do
         end
       end
     end
-  
+
     describe "#synonyms" do
       let(:body) do
         <<-BODY.chomp
-    [
-      {
-        "words": [
-          "stoical",
-          "frigid",
-          "unconcerned",
-          "bleak",
-          "indifferent"
-        ],
-        "relationshipType": "synonym"
-      }
-    ]
-    BODY
+[
+  {
+    "words": [
+      "stoical",
+      "frigid",
+      "unconcerned",
+      "bleak",
+      "indifferent"
+    ],
+    "relationshipType": "synonym"
+  }
+]
+BODY
       end
-    
-      it "replies that the API key is required" do
+
+      before { Lita.config.handlers.wordnik.api_key = "abc123" }
+
+      it "replies with synonyms" do
         send_command("synonyms cold")
-        expect(replies.last).to include("API key required")
-      end
-
-      context "when the API key is set" do
-        before { Lita.config.handlers.wordnik.api_key = "abc123" }
-
-        it "replies with synonyms" do
-          send_command("synonyms cold")
-          expect(replies.last).to include("(synonyms): stoical, frigid, unconcerned, bleak, indifferent")
-        end
-
-        it "URL encodes words" do
-          word = "a phrase with a % sign in it"
-          expect(URI).to receive(:encode).with(word)
-          send_command("synonyms #{word}")
-        end
-
-        it "replies that Wordnik didn't understand the word on 400 status" do
-          allow(response).to receive(:status).and_return(400)
-          send_command("synonyms cold")
-          expect(replies.last).to include("didn't understand")
-        end
-
-        it "replies that Wordnik has no synonyms on 404 status" do
-          allow(response).to receive(:status).and_return(404)
-          send_command("synonyms cold")
-          expect(replies.last).to include("doesn't have any results")
-        end
-
-        it "logs an error and replies that the request completely failed" do
-          allow(response).to receive(:status).and_return(500)
-          send_command("synonyms cold")
-          expect(replies.last).to include("request failed")
-        end
-
-        context "when the response has no synonyms" do
-          let(:body) { "[]" }
-
-          it "replies that Wordnik has no synonyms" do
-            send_command("synonyms z6")
-            expect(replies.last).to include("doesn't have any results")
-          end
-        end
+        expect(replies.last).to include("(synonyms): stoical, frigid, unconcerned, bleak, indifferent")
       end
     end
-  
+
     describe "#antonyms" do
       let(:body) do
     <<-BODY.chomp
-    [
-      {
-        "words": [
-          "hot"
-        ],
-        "relationshipType": "antonym"
-      }
-    ]
-    BODY
+[
+  {
+    "words": [
+      "hot"
+    ],
+    "relationshipType": "antonym"
+  }
+]
+BODY
       end
-    
-      it "replies that the API key is required" do
+
+      before { Lita.config.handlers.wordnik.api_key = "abc123" }
+
+      it "replies with antonyms" do
         send_command("antonyms cold")
-        expect(replies.last).to include("API key required")
-      end
-
-      context "when the API key is set" do
-        before { Lita.config.handlers.wordnik.api_key = "abc123" }
-
-        it "replies with antonyms" do
-          send_command("antonyms cold")
-          expect(replies.last).to include("(antonyms): hot")
-        end
-
-        it "URL encodes words" do
-          word = "a phrase with a % sign in it"
-          expect(URI).to receive(:encode).with(word)
-          send_command("antonyms #{word}")
-        end
-
-        it "replies that Wordnik didn't understand the word on 400 status" do
-          allow(response).to receive(:status).and_return(400)
-          send_command("antonyms cold")
-          expect(replies.last).to include("didn't understand")
-        end
-
-        it "replies that Wordnik has no antonyms on 404 status" do
-          allow(response).to receive(:status).and_return(404)
-          send_command("antonyms cold")
-          expect(replies.last).to include("doesn't have any results")
-        end
-
-        it "logs an error and replies that the request completely failed" do
-          allow(response).to receive(:status).and_return(500)
-          send_command("antonyms cold")
-          expect(replies.last).to include("request failed")
-        end
-
-        context "when the response has no antonyms" do
-          let(:body) { "[]" }
-
-          it "replies that Wordnik has no antonyms" do
-            send_command("antonyms z6")
-            expect(replies.last).to include("doesn't have any results")
-          end
-        end
+        expect(replies.last).to include("(antonyms): hot")
       end
     end
   end
