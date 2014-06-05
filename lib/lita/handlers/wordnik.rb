@@ -27,7 +27,7 @@ module Lita
 
       class << self
         def define_wordnik_method(name, getter_name)
-          define_method name, ->(response) do
+          define_method(name) do |response|
             return unless validate(response)
             word = encode_word(response.matches[0][0])
             result = send(getter_name, word)
