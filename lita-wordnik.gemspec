@@ -1,6 +1,6 @@
 Gem::Specification.new do |spec|
   spec.name          = "lita-wordnik"
-  spec.version       = "0.0.3"
+  spec.version       = "0.1.0"
   spec.authors       = ["Jimmy Cuadra"]
   spec.email         = ["jimmy@jimmycuadra.com"]
   spec.description   = %q{A Lita handler for dictionary functionality backed by Wordnik.}
