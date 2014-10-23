@@ -3,17 +3,13 @@ require "spec_helper"
 describe Lita::Handlers::Wordnik, lita_handler: true do
   let(:response) { double("Faraday::Response", status: 200, body: body) }
 
-  it { routes_command("define computer").to(:define) }
-  it { routes_command("synonyms cold").to(:synonyms) }
-  it { routes_command("syn cold").to(:synonyms) }
-  it { routes_command("words like cold").to(:synonyms) }
-  it { routes_command("antonyms cold").to(:antonyms) }
-  it { routes_command("ant cold").to(:antonyms) }
-  it { routes_command("words unlike cold").to(:antonyms) }
-
-  it "sets the API key to nil by default" do
-    expect(Lita.config.handlers.wordnik.api_key).to be_nil
-  end
+  it { is_expected.to route_command("define computer").to(:define) }
+  it { is_expected.to route_command("synonyms cold").to(:synonyms) }
+  it { is_expected.to route_command("syn cold").to(:synonyms) }
+  it { is_expected.to route_command("words like cold").to(:synonyms) }
+  it { is_expected.to route_command("antonyms cold").to(:antonyms) }
+  it { is_expected.to route_command("ant cold").to(:antonyms) }
+  it { is_expected.to route_command("words unlike cold").to(:antonyms) }
 
   context "with Faraday stubbing" do
     before do
@@ -35,13 +31,8 @@ assembles, stores, correlates, or otherwise processes information.",
 BODY
       end
 
-      it "replies that the API key is required" do
-        send_command("define computer")
-        expect(replies.last).to include("API key required")
-      end
-
       context "when the API key is set" do
-        before { Lita.config.handlers.wordnik.api_key = "abc123" }
+        before { registry.config.handlers.wordnik.api_key = "abc123" }
 
         it "replies with the definition" do
           send_command("define computer")
@@ -101,7 +92,7 @@ BODY
 BODY
       end
 
-      before { Lita.config.handlers.wordnik.api_key = "abc123" }
+      before { registry.config.handlers.wordnik.api_key = "abc123" }
 
       it "replies with synonyms" do
         send_command("synonyms cold")
@@ -123,7 +114,7 @@ BODY
 BODY
       end
 
-      before { Lita.config.handlers.wordnik.api_key = "abc123" }
+      before { registry.config.handlers.wordnik.api_key = "abc123" }
 
       it "replies with antonyms" do
         send_command("antonyms cold")

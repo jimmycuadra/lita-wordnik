@@ -5,9 +5,7 @@ module Lita
     class Wordnik < Handler
       NO_RESULTS = "Wordnik doesn't have any results for that."
 
-      def self.default_config(config)
-        config.api_key = nil
-      end
+      config :api_key, type: String, required: true
 
       route(/define\s+(.+)/i, :define, command: true, help: {
         "define WORD" => "Get the definition for WORD."
@@ -28,7 +26,6 @@ module Lita
       class << self
         def define_wordnik_method(name, getter_name)
           define_method(name) do |response|
-            return unless validate(response)
             word = encode_word(response.matches[0][0])
             result = send(getter_name, word)
             response.reply(result)
@@ -113,15 +110,6 @@ module Lita
           Lita.logger.error("Wordnik request failed: #{response.inspect}")
           "Wordnik request failed. See the Lita logs."
         end
-      end
-
-      def validate(response)
-        if Lita.config.handlers.wordnik.api_key.nil?
-          response.reply "Wordnik API key required."
-          return
-        end
-
-        true
       end
 
       Lita.register_handler(Wordnik)
